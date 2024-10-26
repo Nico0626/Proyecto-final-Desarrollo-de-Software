@@ -1,4 +1,3 @@
-
 class Usuario:
     def __init__(self, usuario_id, nombre, apellido, tipo, saldo, fecha_creacion):
         self.__usuario_id = usuario_id
@@ -6,38 +5,43 @@ class Usuario:
         self.__apellido = apellido
         self.__tipo = tipo
         self.__saldo = saldo
-        self.__fecha_creacion = fecha_creacion
+        self.__fecha_creacion = fecha_creacion  # Cambiado para que sea privado
 
-        @property
+    @property
+    def usuario_id(self):
+        return self.__usuario_id
 
-        @property
+    @property
+    def nombre(self):
+        return self.__nombre
 
-        @property
+    @property
+    def apellido(self):
+        return self.__apellido
 
-        @property
+    @property
+    def tipo(self):
+        return self.__tipo
 
-        @property
+    @property
+    def saldo(self):
+        return self.__saldo
 
+    @property
+    def fecha_creacion(self):  # Agregado para acceder a fecha_creacion
+        return self.__fecha_creacion
 
+    @nombre.setter
+    def nombre(self, valor):
+        self.__nombre = valor
 
+    @apellido.setter
+    def apellido(self, valor):
+        self.__apellido = valor
 
-      def registro():
-        nombre=input("Ingrese su nombre ")
-        apellido=input("Ingrese su apellido")
-        usuario_id=input("Ingrese su nombre de usuario")
-        tipo=""
-        while True:
-            respuesta=int(input("""---Ingrese el numero que corresponda a su respuesta---\n
-                            Usted es:\n 
-                            1.Persona individual \n 
-                            2.Empresa \n
-                            3.Institucion """))
-            if respuesta!=1 or 2 or 3:
-                print("ERROR:ingrese un valor valido")
-                return False 
-        if respuesta==1:
-            tipo="individual"
-        elif respuesta==2:
-            tipo="empresa"
-        elif respuesta==3:
-            tipo="institucion"  
+    @saldo.setter
+    def saldo(self, valor):
+        self.__saldo = valor
+
+    def __repr__(self):
+        return f"({self.usuario_id}, '{self.nombre}', '{self.apellido}', '{self.tipo}', {self.saldo}, {self.fecha_creacion})"

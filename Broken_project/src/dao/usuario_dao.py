@@ -1,88 +1,107 @@
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
+
+
 import mysql.connector
 from mysql.connector import errorcode
-from interfaz_dao import dataAccessDAO
-from conn import Conexion
-from model.Usuario import Usuario
+from src.dao.interfaz_dao import dataAccessDAO
+from src.model.Usuario import Usuario
+from src.conn.Conexion import Conexiondb
 
 
 class UsuarioDAO(dataAccessDAO):
 
-    cone= Conexion.Conexion.ConexionBaseDeDatos()
-
     def create(self, usuario):
         try:
-            cone= Conexion.ConexionBaseDeDatos()
-            cursor= cone.cursor()
-            sql="INSERT INTO Usuario values(%s,%s,%s,null,%s,%s)"
-            valores=(usuarioId,nombre,apellido,tipo,fechaDeCreacion)
-            cursor.execute(sql,valores)
-            cone.commit()
-            print(cursor.rowcount,"Usuario registrado")
-            cone.close()
-
-
+            cone = Conexiondb('localhost', 'root', 'NM260621', 'ArgBroker')  # Asegúrate de pasar los parámetros necesarios
+            cone.conectar()  # Debe devolver la conexión
+            cursor = cone.connection.cursor()
+            sql = "INSERT INTO Usuario VALUES (null, %s, %s, %s, null, %s)"
+            valores = (usuario.nombre, usuario.apellido, usuario.tipo, usuario.fechaDeCreacion)
+            cursor.execute(sql, valores)
+            cone.connection.commit()
+            print(cursor.rowcount, "Usuario registrado")
         except mysql.connector.Error as error:
-            print("Error al conectar a la base de datos{}".format(error))
+            print("Error al conectar a la base de datos: {}".format(error))
+        finally:
+            if cursor:
+                cursor.close()
+            if cone.connection:
+                cone.close()
 
     def read(self, usuario_id):
         try:
-            cone= Conexion.ConexionBaseDeDatos()
-            cursor= cone.cursor()
-            sql="SELECT * FROM Usuarios WHERE usuario_id= %s"
-            cursor.execute(sql,usuario_id)
-            cone.commit()
-            row = cursor.fetchone() 
-            cursor.close()
+            cone = Conexiondb('localhost', 'root', 'NM260621', 'ARGBroker')
+            cone.conectar()
+            cursor = cone.connection.cursor()
+            sql = "SELECT * FROM Usuario WHERE usuario_id = %s"
+            cursor.execute(sql, (usuario_id,))
+            row = cursor.fetchone()
             if row:
-                return Usuario(*row)  
+                return Usuario(*row)
             return None
-
         except mysql.connector.Error as error:
-            print("Error al conectar a la base de datos{}".format(error))
+            print("Error al conectar a la base de datos: {}".format(error))
+        finally:
+            if cursor:
+                cursor.close()
+            if cone.connection:
+                cone.close()
 
     def read_all(self):
         try:
-            cone=Conexion.ConexionBAseDeDatos()
-            cursor=cone.cursor()
-            sql="SELECT * Usuario"
+            cone = Conexiondb('localhost', 'root', 'NM260621', 'ARGBroker')
+            cone.conectar()
+            cursor = cone.connection.cursor()
+            sql = "SELECT * FROM Usuario"
             cursor.execute(sql)
-            cone.commit()
-            row = cursor.fetchone() 
-            cursor.close()
-            if row:
-                return Usuario(*row)  
-            return None
-
+            rows = cursor.fetchall()
+            usuarios = [Usuario(*row) for row in rows]  # Crear lista de objetos Usuario
+            return usuarios
         except mysql.connector.Error as error:
-            print("Error al conectar a la base de datos{}".format(error))
-
-
+            print("Error al conectar a la base de datos: {}".format(error))
+        finally:
+            if cursor:
+                cursor.close()
+            if cone.connection:
+                cone.close()
 
     def update(self, usuario):
-        sql = "UPDATE Usuarios SET nombre = ?, apellido = ?, tipo = ?, saldo = ? WHERE usuario_id = ?"
-        cursor = self.connection.cursor()
-        cursor.execute(sql, (usuario.nombre, usuario.apellido, usuario.tipo, usuario.saldo, usuario.usuario_id))
-        self.connection.commit()
         try:
-            cone=Conexion.ConexionBAseDeDatos()
-            cursor=cone.cursor()
-            sql="UPDATE Usuarios SET nombre = ?, apellido = ?, tipo = ?, saldo = ? WHERE usuario_id = ?"
-            cursor.execute(sql)
-            cone.commit()
-            row = cursor.fetchone() 
-            cursor.close()
-            if row:
-                return usuario(*row)  
-            return None
-
+            cone = Conexiondb('localhost', 'root', 'NM260621', 'ARGBroker')
+            cone.conectar()
+            cursor = cone.connection.cursor()
+            sql = """
+                UPDATE Usuario 
+                SET nombre = %s, apellido = %s, tipo = %s, saldo = %s 
+                WHERE usuario_id = %s
+            """
+            valores = (usuario.nombre, usuario.apellido, usuario.tipo, usuario.saldo, usuario.usuario_id)
+            cursor.execute(sql, valores)
+            cone.connection.commit()
+            print(cursor.rowcount, "Usuario actualizado")
         except mysql.connector.Error as error:
-            print("Error al conectar a la base de datos{}".format(error))
-
-
-
+            print("Error al conectar a la base de datos: {}".format(error))
+        finally:
+            if cursor:
+                cursor.close()
+            if cone.connection:
+                cone.close()
 
     def delete(self, usuario_id):
-        sql = "DELETE FROM Usuarios WHERE usuario_id = %s"
-        cursor = self.connection.cursor()
-        cursor.execute(sql, (usuario_id,))
-        self.connection.commit()
+        try:
+            cone = Conexiondb('localhost', 'root', 'NM260621', 'ARGBroker')
+            cone.conectar()
+            cursor = cone.connection.cursor()
+            sql = "DELETE FROM Usuario WHERE usuario_id = %s"
+            cursor.execute(sql, (usuario_id,))
+            cone.connection.commit()
+            print(cursor.rowcount, "Usuario eliminado")
+        except mysql.connector.Error as error:
+            print("Error al conectar a la base de datos: {}".format(error))
+        finally:
+            if cursor:
+                cursor.close()
+            if cone.connection:
+                cone.close()
