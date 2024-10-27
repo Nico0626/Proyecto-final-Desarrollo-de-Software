@@ -17,8 +17,8 @@ class UsuarioDAO(dataAccessDAO):
             cone = Conexiondb('localhost', 'root', 'NM260621', 'ArgBroker')  # Asegúrate de pasar los parámetros necesarios
             cone.conectar()  # Debe devolver la conexión
             cursor = cone.connection.cursor()
-            sql = "INSERT INTO Usuario VALUES (null, %s, %s, %s, null, %s)"
-            valores = (usuario.nombre, usuario.apellido, usuario.tipo, usuario.fechaDeCreacion)
+            sql = "INSERT INTO Usuario VALUES (null, %s, %s, %s,%s, null, %s)"
+            valores = (usuario.nombre, usuario.apellido,usuario.gmail, usuario.tipo, usuario.fechaDeCreacion)
             cursor.execute(sql, valores)
             cone.connection.commit()
             print(cursor.rowcount, "Usuario registrado")

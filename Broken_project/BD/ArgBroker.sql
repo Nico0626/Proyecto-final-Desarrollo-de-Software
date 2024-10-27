@@ -7,6 +7,8 @@ CREATE TABLE Usuarios (
     usuario_id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
     apellido VARCHAR(100) NOT NULL,
+    contraseña VARCHAR(100) NOT NULL,
+    gmail VARCHAR(100) NOT NULL,
     tipo ENUM('individual', 'empresa', 'institucion') NOT NULL,
     saldo DECIMAL(15,2) DEFAULT 1000000.00,
     fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP

@@ -1,8 +1,10 @@
 class Usuario:
-    def __init__(self, usuario_id, nombre, apellido, tipo, saldo, fecha_creacion):
+    def __init__(self, usuario_id, nombre, apellido,contraseña,gmail, tipo, saldo, fecha_creacion):
         self.__usuario_id = usuario_id
         self.__nombre = nombre
         self.__apellido = apellido
+        self.__contraseña=contraseña
+        self.__gmail=gmail
         self.__tipo = tipo
         self.__saldo = saldo
         self.__fecha_creacion = fecha_creacion  # Cambiado para que sea privado
@@ -18,6 +20,14 @@ class Usuario:
     @property
     def apellido(self):
         return self.__apellido
+    
+    @property
+    def contraseña(self):
+        return self.__contraseña
+    
+    @property
+    def gmail(self):
+        return self.__gmail
 
     @property
     def tipo(self):
