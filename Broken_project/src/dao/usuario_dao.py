@@ -49,6 +49,26 @@ class UsuarioDAO(dataAccessDAO):
             if cone.connection:
                 cone.close()
 
+    def read_por_gmail(self, gmail):
+        try:
+            cone = Conexiondb('localhost', 'root', 'NM260621', 'ARGBroker')
+            cone.conectar()
+            cursor = cone.connection.cursor()
+            sql = "SELECT * FROM Usuario WHERE gmail = %s"
+            cursor.execute(sql, (gmail,))
+            row = cursor.fetchone()
+            if row:
+                return Usuario.gmail(*row)
+            return None
+        except mysql.connector.Error as error:
+            print("Error al conectar a la base de datos: {}".format(error))
+        finally:
+            if cursor:
+                cursor.close()
+            if cone.connection:
+                cone.close()
+
+
     def read_all(self):
         try:
             cone = Conexiondb('localhost', 'root', 'NM260621', 'ARGBroker')

@@ -39,7 +39,7 @@ def registrar_inversor(usuario_dao):
 def iniciar_sesion(usuario_dao):
     email = input("Ingrese su email: ")
     contraseña = input("Ingrese su contraseña: ")
-    usuario = usuario_dao.read_by_email(email)
+    usuario = usuario_dao.read_por_gmail(email)
 
     if usuario and usuario.contraseña == contraseña:
         print(f"Bienvenido, {usuario.nombre} {usuario.apellido}")
