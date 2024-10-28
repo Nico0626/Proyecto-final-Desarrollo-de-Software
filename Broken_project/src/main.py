@@ -30,18 +30,18 @@ def registrar_inversor(usuario_dao):
     apellido = input("Ingrese su apellido: ")
     cuil = input("Ingrese su CUIL: ")
     email = input("Ingrese su email: ")
-    contrasena = input("Ingrese su contraseña: ")
+    contraseña = input("Ingrese su contraseña: ")
 
-    usuario = Usuario(usuario_id=None, nombre=nombre, apellido=apellido, cuil=cuil, email=email, contrasena=contrasena, saldo=Decimal('1000000.00'), fecha_creacion=datetime.now())
+    usuario = Usuario(usuario_id=None, nombre=nombre, apellido=apellido, cuil=cuil, email=email, contraseña=contraseña, saldo=Decimal('1000000.00'), fecha_creacion=datetime.now())
     usuario_dao.create(usuario)
     print("Inversor registrado con éxito.")
 
 def iniciar_sesion(usuario_dao):
     email = input("Ingrese su email: ")
-    contrasena = input("Ingrese su contraseña: ")
+    contraseña = input("Ingrese su contraseña: ")
     usuario = usuario_dao.read_by_email(email)
 
-    if usuario and usuario.contrasena == contrasena:
+    if usuario and usuario.contraseña == contraseña:
         print(f"Bienvenido, {usuario.nombre} {usuario.apellido}")
         return usuario
     else:
