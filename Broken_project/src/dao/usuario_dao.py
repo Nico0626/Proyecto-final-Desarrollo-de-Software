@@ -105,3 +105,23 @@ class UsuarioDAO(dataAccessDAO):
                 cursor.close()
             if cone.connection:
                 cone.close()
+
+
+    def autenticar(self, email, contrasena):
+        try:
+            cone = Conexiondb('localhost', 'root', 'NM260621', 'ARGBroker')
+            cone.conectar()
+            cursor = cone.connection.cursor()
+            sql = "SELECT * FROM Usuarios WHERE email = %s AND contrasena = %s"
+            cursor.execute(sql, (email, contrasena))
+            row = cursor.fetchone()
+            if row:
+                return Usuario(*row)  # Retorna el objeto Usuario si las credenciales son correctas
+            return None  # Retorna None si no se encuentra el usuario
+        except mysql.connector.Error as error:
+            print("Error al conectar a la base de datos: {}".format(error))
+        finally:
+            if cursor:
+                cursor.close()
+            if cone.connection:
+                cone.close()
