@@ -1,24 +1,18 @@
-import sys
-import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
-
-
 import mysql.connector
 from mysql.connector import errorcode
-from src.dao.interfaz_dao import dataAccessDAO
-from src.model.Usuario import Usuario
-from src.conn.Conexion import Conexiondb
-
+from dao.interfaz_dao import dataAccessDAO
+from model.Usuario import Usuario
+from conn.Conexion import Conexiondb
 
 class UsuarioDAO(dataAccessDAO):
 
     def create(self, usuario):
         try:
-            cone = Conexiondb('localhost', 'root', 'NM260621', 'ArgBroker')  # Asegúrate de pasar los parámetros necesarios
-            cone.conectar()  # Debe devolver la conexión
+            cone = Conexiondb('localhost', 'root', 'NM260621', 'ArgBroker')
+            cone.conectar()
             cursor = cone.connection.cursor()
-            sql = "INSERT INTO Usuario VALUES (null, %s, %s, %s,%s, null, %s)"
-            valores = (usuario.nombre, usuario.apellido,usuario.gmail, usuario.tipo, usuario.fechaDeCreacion)
+            sql = "INSERT INTO Usuarios VALUES (null, %s, %s, %s,%s, %s, %s, %s)"
+            valores = (usuario.nombre, usuario.apellido,usuario.documento, usuario.mail,usuario.contraseña,usuario.saldo, usuario.fecha_creacion)
             cursor.execute(sql, valores)
             cone.connection.commit()
             print(cursor.rowcount, "Usuario registrado")
@@ -35,7 +29,7 @@ class UsuarioDAO(dataAccessDAO):
             cone = Conexiondb('localhost', 'root', 'NM260621', 'ARGBroker')
             cone.conectar()
             cursor = cone.connection.cursor()
-            sql = "SELECT * FROM Usuario WHERE usuario_id = %s"
+            sql = "SELECT * FROM Usuarios WHERE usuario_id = %s"
             cursor.execute(sql, (usuario_id,))
             row = cursor.fetchone()
             if row:
@@ -49,17 +43,26 @@ class UsuarioDAO(dataAccessDAO):
             if cone.connection:
                 cone.close()
 
-    def read_por_gmail(self, gmail):
+    def read_por_mail(self, mail):
         try:
             cone = Conexiondb('localhost', 'root', 'NM260621', 'ARGBroker')
             cone.conectar()
             cursor = cone.connection.cursor()
-            sql = "SELECT * FROM Usuario WHERE gmail = %s"
-            cursor.execute(sql, (gmail,))
+            sql = "SELECT * FROM Usuarios WHERE mail = %s"
+            cursor.execute(sql, (mail,))
             row = cursor.fetchone()
             if row:
-                return Usuario.gmail(*row)
-            return None
+                return Usuario(
+                usuario_id=row[0],
+                nombre=row[1],
+                apellido=row[2],
+                documento=row[3],
+                mail=row[4],
+                contraseña=row[5],
+                saldo=row[6],
+                fecha_creacion=row[7]
+            )
+            return  None
         except mysql.connector.Error as error:
             print("Error al conectar a la base de datos: {}".format(error))
         finally:
@@ -68,16 +71,15 @@ class UsuarioDAO(dataAccessDAO):
             if cone.connection:
                 cone.close()
 
-
     def read_all(self):
         try:
             cone = Conexiondb('localhost', 'root', 'NM260621', 'ARGBroker')
             cone.conectar()
             cursor = cone.connection.cursor()
-            sql = "SELECT * FROM Usuario"
+            sql = "SELECT * FROM Usuarios"
             cursor.execute(sql)
             rows = cursor.fetchall()
-            usuarios = [Usuario(*row) for row in rows]  # Crear lista de objetos Usuario
+            usuarios = [Usuario(*row) for row in rows]
             return usuarios
         except mysql.connector.Error as error:
             print("Error al conectar a la base de datos: {}".format(error))
@@ -93,11 +95,11 @@ class UsuarioDAO(dataAccessDAO):
             cone.conectar()
             cursor = cone.connection.cursor()
             sql = """
-                UPDATE Usuario 
-                SET nombre = %s, apellido = %s, tipo = %s, saldo = %s 
+                UPDATE Usuarios 
+                SET nombre = %s, apellido = %s, saldo = %s 
                 WHERE usuario_id = %s
             """
-            valores = (usuario.nombre, usuario.apellido, usuario.tipo, usuario.saldo, usuario.usuario_id)
+            valores = (usuario.nombre, usuario.apellido, usuario.saldo, usuario.usuario_id)
             cursor.execute(sql, valores)
             cone.connection.commit()
             print(cursor.rowcount, "Usuario actualizado")
@@ -114,7 +116,7 @@ class UsuarioDAO(dataAccessDAO):
             cone = Conexiondb('localhost', 'root', 'NM260621', 'ARGBroker')
             cone.conectar()
             cursor = cone.connection.cursor()
-            sql = "DELETE FROM Usuario WHERE usuario_id = %s"
+            sql = "DELETE FROM Usuarios WHERE usuario_id = %s"
             cursor.execute(sql, (usuario_id,))
             cone.connection.commit()
             print(cursor.rowcount, "Usuario eliminado")
@@ -126,18 +128,17 @@ class UsuarioDAO(dataAccessDAO):
             if cone.connection:
                 cone.close()
 
-
-    def autenticar(self, email, contrasena):
+    def autenticar(self, mail, contrasena):
         try:
             cone = Conexiondb('localhost', 'root', 'NM260621', 'ARGBroker')
             cone.conectar()
             cursor = cone.connection.cursor()
-            sql = "SELECT * FROM Usuarios WHERE email = %s AND contrasena = %s"
-            cursor.execute(sql, (email, contrasena))
+            sql = "SELECT * FROM Usuarios WHERE mail = %s AND contrasena = %s"
+            cursor.execute(sql, (mail, contrasena))
             row = cursor.fetchone()
             if row:
-                return Usuario(*row)  # Retorna el objeto Usuario si las credenciales son correctas
-            return None  # Retorna None si no se encuentra el usuario
+                return Usuario(*row)
+            return None  
         except mysql.connector.Error as error:
             print("Error al conectar a la base de datos: {}".format(error))
         finally:

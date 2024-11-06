@@ -1,7 +1,7 @@
 # src/dao/AccionDAO.py
 import mysql.connector
-from src.model.Accion import Accion
-from src.conn.Conexion import Conexiondb
+from model.Accion import Accion
+from conn.Conexion import Conexiondb
 
 class AccionDAO:
     def create(self, accion):
@@ -37,6 +37,40 @@ class AccionDAO:
         finally:
             cursor.close()
             cone.close()
+
+    def read_by_simbolo(self, simbolo):
+        try:
+            cone = Conexiondb('localhost', 'root', 'NM260621', 'ARGBroker')
+            cone.conectar()
+            cursor = cone.connection.cursor()
+            sql = "SELECT * FROM Acciones WHERE simbolo = %s"
+            cursor.execute(sql, (simbolo,))
+            row = cursor.fetchone()
+            if row:
+                return Accion(
+                        accion_id=row[0],
+                        simbolo=row[1],
+                        empresa_id=row[2],
+                        ultimo_operado=row[3],
+                        cantidad_compra_diaria=row[4],
+                        precio_compra_actual=row[5],
+                        precio_venta_actual=row[6],
+                        cantidad_venta_diaria=row[7],
+                        apertura=row[8],
+                        minimo_diario=row[9],
+                        maximo_diario=row[10],
+                        ultimo_cierre=row[11],
+                        fecha_actualizacion=row[12]
+                    )
+
+            return None
+        except mysql.connector.Error as error:
+            print("Error al leer la acción: {}".format(error))
+        finally:
+            if cursor:
+                cursor.close()
+            if cone.connection:
+                cone.close()        
 
     def read(self, accion_id):
         try:

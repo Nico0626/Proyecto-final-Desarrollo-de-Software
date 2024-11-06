@@ -1,7 +1,7 @@
 # src/dao/BrokerDAO.py
 import mysql.connector
-from src.model.Broker import Broker
-from src.conn.Conexion import Conexiondb
+from model.Broker import Broker
+from conn.Conexion import Conexiondb
 
 class BrokerDAO:
     def create(self, broker):

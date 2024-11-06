@@ -1,24 +1,19 @@
-import sys
-import os
 from datetime import datetime
 from decimal import Decimal
-from src.dao.usuario_dao import UsuarioDAO
-from src.dao.portafolio_dao import PortafolioDAO
-from src.dao.accion_dao import AccionDAO
-from src.dao.transaccion_dao import TransaccionDAO
-from src.model.Usuario import Usuario
-
-# Agregar el directorio raíz al PYTHONPATH
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
+from dao.usuario_dao import UsuarioDAO
+from dao.portafolio_dao import PortafolioDAO
+from dao.accion_dao import AccionDAO
+from dao.transaccion_dao import TransaccionDAO
+from model.Usuario import Usuario
 
 def mostrar_menu():
-    print("*** Menú Principal ***")
+    print("\n--- Menú Principal ---")
     print("1. Registrar Inversor")
     print("2. Iniciar Sesión")
     print("3. Salir")
 
 def mostrar_menu_usuario():
-    print("*** Menú Usuario ***")
+    print("\n--- Menú Usuario ---")
     print("1. Mostrar datos de la cuenta")
     print("2. Listar activos del portafolio")
     print("3. Comprar acción")
@@ -26,76 +21,70 @@ def mostrar_menu_usuario():
     print("5. Cerrar sesión")
 
 def registrar_inversor(usuario_dao):
-    nombre = input("Ingrese su nombre: ")
-    apellido = input("Ingrese su apellido: ")
-    cuil = input("Ingrese su CUIL: ")
-    email = input("Ingrese su email: ")
-    contraseña = input("Ingrese su contraseña: ")
-
-    usuario = Usuario(usuario_id=None, nombre=nombre, apellido=apellido, cuil=cuil, email=email, contraseña=contraseña, saldo=Decimal('1000000.00'), fecha_creacion=datetime.now())
+    nombre = input("Ingrese Nombre: ")
+    apellido = input("Ingrese Apellido: ")
+    documento = input("Ingrese Documento: ")
+    mail = input("Ingrese Mail: ")
+    contraseña = input("Ingrese contraseña: ")
+    usuario = Usuario(usuario_id=None, nombre=nombre, apellido=apellido, documento=documento, mail=mail, contraseña=contraseña, saldo=Decimal('1000000.00'), fecha_creacion=datetime.now())
     usuario_dao.create(usuario)
     print("Inversor registrado con éxito.")
 
 def iniciar_sesion(usuario_dao):
-    email = input("Ingrese su email: ")
-    contraseña = input("Ingrese su contraseña: ")
-    usuario = usuario_dao.read_por_gmail(email)
-
+    mail = input("Ingrese su mail: ")
+    contraseña = input("Ingrese su contraseña: ")   
+    usuario = usuario_dao.read_por_mail(mail)   
     if usuario and usuario.contraseña == contraseña:
-        print(f"Bienvenido, {usuario.nombre} {usuario.apellido}")
+        print(f"\nBienvenido, {usuario.nombre} {usuario.apellido}")
         return usuario
     else:
-        print("Email o contraseña incorrectos.")
+        print("Mail o contraseña incorrectos.")
         return None
 
-def mostrar_datos_cuenta(usuario):
-    print(f"Nombre: {usuario.nombre} {usuario.apellido}")
-    print(f"Saldo: {usuario.saldo}")
+def mostrar_datos_cuenta(usuarios):
+    print(f" \n Nombre: {usuarios.nombre} \n Apellido: {usuarios.apellido} \n Documento: {usuarios.documento} \n Saldo: {usuarios.saldo} \n Correo: {usuarios.mail} \n Fecha creacion: {usuarios.fecha_creacion}")
 
 def listar_activos(portafolio_dao, usuario_id):
     activos = portafolio_dao.read(usuario_id)
     if not activos:
         print("No tienes activos en tu portafolio.")
         return
-
     for activo in activos:
-        print(f"Activos: {activo.nombre} - Cantidad: {activo.cantidad} - Precio Actual: {activo.precio_actual} - Rendimiento: {activo.rendimiento}")
+        print(f"\nSimbolo: {activo.simbolo}\nCantidad: {activo.cantidad} ")
 
 def comprar_accion(usuario, portafolio_dao, accion_dao, transaccion_dao):
     simbolo = input("Ingrese el símbolo de la acción que desea comprar: ")
     cantidad = int(input("Ingrese la cantidad de acciones a comprar: "))
-    
+    comision = 1.5
     accion = accion_dao.read_by_simbolo(simbolo)
-
-    if accion and usuario.saldo >= accion.precio_compra * cantidad:
-       
-        transaccion_dao.create(usuario.usuario_id, accion.accion_id, 'compra', cantidad, accion.precio_compra)
-        
-        
-        usuario.saldo -= accion.precio_compra * cantidad
-        portafolio_dao.update(usuario.usuario_id, simbolo, cantidad)
-
-        print("Compra realizada con éxito.")
+    if accion is None:
+        print("La acción con ese símbolo no existe.")
+        return    
+    total_precio = accion.precio_compra_actual * cantidad
+    if usuario.saldo >= total_precio:
+        transaccion_dao.create(usuario.usuario_id, accion.accion_id, 'compra', cantidad, accion.precio_compra_actual, comision)       
+        usuario.saldo -= total_precio
+        portafolio_id = portafolio_dao.get_portafolio_id(usuario.usuario_id, simbolo)     
+        if portafolio_id:
+            portafolio_dao.update(usuario.usuario_id, portafolio_id, simbolo, cantidad)
+            print("Portafolio actualizado con éxito.")
+        else:
+            portafolio_dao.create(usuario.usuario_id, simbolo, cantidad)
+            print("Portafolio creado con éxito.")
+        print(f"Compra realizada con éxito. Se han comprado {cantidad} acciones de {simbolo}.")
     else:
-        print("Fondos insuficientes o acción no encontrada.")
+        print("Fondos insuficientes para completar la compra.")
 
 def vender_accion(usuario, portafolio_dao, accion_dao, transaccion_dao):
     simbolo = input("Ingrese el símbolo de la acción que desea vender: ")
     cantidad = int(input("Ingrese la cantidad de acciones a vender: "))
-    
-  
+    comision = 1.5  
     activo = portafolio_dao.read_by_simbolo(usuario.usuario_id, simbolo)
-
     if activo and activo.cantidad >= cantidad:
-        accion = accion_dao.read_by_simbolo(simbolo)
-
-        
-        transaccion_dao.create(usuario.usuario_id, accion.accion_id, 'venta', cantidad, accion.precio_venta)
-
-       
-        usuario.saldo += accion.precio_venta * cantidad
+        accion = accion_dao.read_by_simbolo(simbolo)    
+        transaccion_dao.create(usuario.usuario_id, accion.accion_id, 'venta', cantidad, accion.precio_venta_actual, comision)      
+        usuario.saldo += accion.precio_venta_actual * cantidad
         portafolio_dao.update(usuario.usuario_id, simbolo, -cantidad)
-
         print("Venta realizada con éxito.")
     else:
         print("No tienes suficientes acciones para vender.")
@@ -105,11 +94,9 @@ def main():
     portafolio_dao = PortafolioDAO()
     accion_dao = AccionDAO()
     transaccion_dao = TransaccionDAO()
-
     while True:
         mostrar_menu()
         opcion = input("Seleccione una opción: ")
-
         if opcion == "1":
             registrar_inversor(usuario_dao)
         elif opcion == "2":
@@ -118,7 +105,6 @@ def main():
                 while True:
                     mostrar_menu_usuario()
                     opcion_usuario = input("Seleccione una opción: ")
-
                     if opcion_usuario == "1":
                         mostrar_datos_cuenta(usuario)
                     elif opcion_usuario == "2":

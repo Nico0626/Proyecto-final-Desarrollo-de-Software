@@ -6,7 +6,6 @@ class empresa:
         self.__sector=sector
         self.__fecha_de_creacion=fecha_de_creacion
          
-
     @property
     def empresa_id(self):
         return self.__empresa_id

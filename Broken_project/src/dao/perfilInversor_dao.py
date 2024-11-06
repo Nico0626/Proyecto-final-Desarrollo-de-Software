@@ -1,7 +1,6 @@
-# src/dao/PerfilInversorDAO.py
 import mysql.connector
-from src.model.PerfilInversor import PerfilInversor
-from src.conn.Conexion import Conexiondb
+from model.PerfilInversor import PerfilInversor
+from conn.Conexion import Conexiondb
 
 class PerfilInversorDAO:
     def create(self, perfil_inversor):

@@ -1,27 +1,24 @@
-# src/dao/TransaccionDAO.py
 import mysql.connector
-from src.model.Transaccion import Transaccion
-from src.conn.Conexion import Conexiondb
+from model.Transaccion import Transaccion
+from conn.Conexion import Conexiondb
 
 class TransaccionDAO:
-    def create(self, transaccion):
+    def create(self, usuario_id, accion_id, tipo, cantidad, precio, comision):
         try:
             cone = Conexiondb('localhost', 'root', 'NM260621', 'ARGBroker')
             cone.conectar()
             cursor = cone.connection.cursor()
             sql = """
-                INSERT INTO Transacciones (usuario_id, accion_id, broker_id, tipo, cantidad, precio, comision, fecha)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                INSERT INTO Transacciones (usuario_id, accion_id,tipo, cantidad, precio, comision)
+                VALUES (%s, %s, %s, %s, %s, %s)
             """
             valores = (
-                transaccion.usuario_id,
-                transaccion.accion_id,
-                transaccion.broker_id,
-                transaccion.tipo,
-                transaccion.cantidad,
-                transaccion.precio,
-                transaccion.comision,
-                transaccion.fecha
+                usuario_id,
+                accion_id,
+                tipo,
+                cantidad,
+                precio,
+                comision              
             )
             cursor.execute(sql, valores)
             cone.connection.commit()

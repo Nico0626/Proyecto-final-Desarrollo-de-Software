@@ -1,21 +1,15 @@
-import sys
-import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
-
-
 import mysql.connector
 from mysql.connector import errorcode
-from src.dao.interfaz_dao import dataAccessDAO
-from src.model.Empresa import empresa
-from src.conn.Conexion import Conexiondb
-
+from dao.interfaz_dao import dataAccessDAO
+from model.Empresa import empresa
+from conn.Conexion import Conexiondb
 
 class UsuarioDAO(dataAccessDAO):
 
     def create(self, empresa):
         try:
-            cone = Conexiondb('localhost', 'root', 'NM260621', 'ArgBroker')  # Asegúrate de pasar los parámetros necesarios
-            cone.conectar()  # Debe devolver la conexión
+            cone = Conexiondb('localhost', 'root', 'NM260621', 'ArgBroker')
+            cone.conectar()
             cursor = cone.connection.cursor()
             sql = "INSERT INTO Empresas VALUES (null, %s, %s, %s, null, %s)"
             valores = (empresa.nombre, empresa.cuit, empresa.sector, empresa.fecha_de_creacion)
@@ -57,7 +51,7 @@ class UsuarioDAO(dataAccessDAO):
             sql = "SELECT * FROM Usuario"
             cursor.execute(sql)
             rows = cursor.fetchall()
-            empresas = [empresa(*row) for row in rows]  # Crear lista de objetos Usuario
+            empresas = [empresa(*row) for row in rows]
             return empresas
         except mysql.connector.Error as error:
             print("Error al conectar a la base de datos: {}".format(error))

@@ -1,7 +1,7 @@
 # src/dao/CotizacionDAO.py
 import mysql.connector
-from src.model.Cotizacion import Cotizacion
-from src.conn.Conexion import Conexiondb
+from model.Cotizacion import Cotizacion
+from conn.Conexion import Conexiondb
 
 class CotizacionDAO:
     def create(self, cotizacion):

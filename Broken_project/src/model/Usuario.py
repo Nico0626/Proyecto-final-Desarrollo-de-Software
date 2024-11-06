@@ -1,13 +1,14 @@
 class Usuario:
-    def __init__(self, usuario_id, nombre, apellido,contraseña,gmail, tipo, saldo, fecha_creacion):
+    def __init__(self, usuario_id, nombre, apellido,documento,contraseña,mail, saldo, fecha_creacion):
         self.__usuario_id = usuario_id
         self.__nombre = nombre
         self.__apellido = apellido
+        self.__documento= documento 
         self.__contraseña=contraseña
-        self.__gmail=gmail
-        self.__tipo = tipo
+        self.__mail= mail
         self.__saldo = saldo
-        self.__fecha_creacion = fecha_creacion  # Cambiado para que sea privado
+        self.__fecha_creacion = fecha_creacion 
+        
 
     @property
     def usuario_id(self):
@@ -22,23 +23,23 @@ class Usuario:
         return self.__apellido
     
     @property
+    def documento(self):
+       return self.__documento 
+    
+    @property
     def contraseña(self):
         return self.__contraseña
     
     @property
-    def gmail(self):
-        return self.__gmail
-
-    @property
-    def tipo(self):
-        return self.__tipo
+    def mail(self):
+        return self.__mail
 
     @property
     def saldo(self):
         return self.__saldo
-
+  
     @property
-    def fecha_creacion(self):  # Agregado para acceder a fecha_creacion
+    def fecha_creacion(self): 
         return self.__fecha_creacion
 
     @nombre.setter
@@ -52,6 +53,6 @@ class Usuario:
     @saldo.setter
     def saldo(self, valor):
         self.__saldo = valor
-
+        
     def __repr__(self):
-        return f"({self.usuario_id}, '{self.nombre}', '{self.apellido}', '{self.tipo}', {self.saldo}, {self.fecha_creacion})"
+        return f"({self.usuario_id}, '{self.nombre}', '{self.apellido}', '{self.documento}', {self.saldo}, {self.fecha_creacion})"
